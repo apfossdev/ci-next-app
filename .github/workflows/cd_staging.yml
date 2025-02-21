@@ -11,8 +11,10 @@ jobs:
       - name: SSH Into server
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" &> ~/ssh_key
-          mkdir .ssh
-          echo "${{ secrets.KNOWN_HOSTS }}" &> ~/.ssh/known_hosts
+          mkdir -p /home/runner/.ssh
+          ls /home/runner/.ssh
+          touch /home/runner/.ssh/known_hosts
+          echo "${{ secrets.KNOWN_HOSTS }}" &> ~/home/runner/.ssh/known_hosts
           ssh -i ~/ssh_key root@64.227.172.68
           cd ci-next-app && git pull
           pnpm install
