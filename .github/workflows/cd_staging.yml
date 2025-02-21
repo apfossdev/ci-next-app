@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: SSH Into server
         run: |
-          echo ${{ secrets.SSH_PRIVATE_KEY }} &> ~/ssh_key
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" &> ~/ssh_key
           ssh -i ~/ssh_key root@64.227.172.68
           cd ci-next-app && git pull
           pnpm install
