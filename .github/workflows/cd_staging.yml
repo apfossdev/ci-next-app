@@ -1,18 +1,34 @@
 name: Deploy to staging
+
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
-  redeploy_everything:
+  deploy:
     runs-on: ubuntu-latest
-    name: Deploying everything to the staging cluster
+
     steps:
-      - run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" &> ~/ssh_key
-          mkdir -p /home/runner/.ssh
-          ls /home/runner/.ssh
-          touch /home/runner/.ssh/known_hosts
-          echo "${{ secrets.KNOWN_HOSTS }}" &> /home/runner/.ssh/known_hosts
-          chmod 700 /home/runner/ssh_key
-          ssh -i ~/ssh_key root@64.227.172.68 -t "cd ci-next-app/ && git pull origin main && export PATH=/root/.nvm/versions/node/v22.13.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin && npm install -g pnpm && pnpm install && pnpm run build && pm2 restart fe-server && pm2 restart http-server && pm2 restart ws-server"
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    - name: Install dependencies
+      run: npm install -g pnpm
+
+    - name: Build and deploy
+      run: |
+        ssh -i ~/ssh_key root@64.227.172.68 -t "
+        cd ci-next-app/ &&
+        git pull origin main &&
+        export PATH=/root/.nvm/versions/node/v16.13.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin &&
+        pnpm install &&
+        pnpm run build &&
+        pm2 restart fe-server &&
+        pm2 restart http-server &&
+        pm2 restart ws-server"
