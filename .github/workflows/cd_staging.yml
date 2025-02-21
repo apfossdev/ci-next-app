@@ -6,15 +6,16 @@ on:
       - main
 jobs:
   redeploy_everything:
+    runs-on: ubuntu-latest
     name: Deploying everything to the staging cluster
     steps:
-      - name: SSH Into server
-      - run: |
-          echo ${{ secrets.SSH_PRIVATE_KEY }} &> ~/ssh_key
-          ssh -i ~/ssh_key root@64.227.172.68
-          cd ci-next-app && git pull
-          pnpm install
-          pnpm run build
-          pm2 restart fe-server
-          pm2 restart http-server
-          pm2 restart ws-server
+      name: SSH Into server
+      run: |
+        echo ${{ secrets.SSH_PRIVATE_KEY }} &> ~/ssh_key
+        ssh -i ~/ssh_key root@64.227.172.68
+        cd ci-next-app && git pull
+        pnpm install
+        pnpm run build
+        pm2 restart fe-server
+        pm2 restart http-server
+        pm2 restart ws-server
